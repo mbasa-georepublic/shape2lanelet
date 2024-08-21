@@ -1,0 +1,6 @@
+.settings
+shikoku-latest-free/
+*.osm
+.project
+.classpath
+target
