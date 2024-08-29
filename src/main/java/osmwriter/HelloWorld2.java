@@ -232,31 +232,7 @@ public class HelloWorld2 {
                         writer.process(r);
                     }
                 }
-            }                                    
-            /*
-             * Tag tag1 = new Tag("Hello", "World");
-             * Tag tag2 = new Tag("こんにちは", "世界");
-             * 
-             * Collection<Tag> tags = new ArrayList<Tag>();
-             * tags.add(tag1);
-             * tags.add(tag2);
-             * 
-             * CommonEntityData ce = new CommonEntityData(1, 2,
-             * new Date(), OsmUser.NONE, 3,tags);
-             * 
-             * Node n = new Node(ce, 35d, 135d);
-             * NodeContainer node = new NodeContainer(n);
-             * 
-             * List<WayNode> nodes = new ArrayList<WayNode>();
-             * nodes.add(new WayNode(1l));
-             * nodes.add(new WayNode(2l));
-             * nodes.add(new WayNode(3l));
-             * 
-             * WayContainer ways = new WayContainer(new Way(ce,nodes));
-             */
-            //writer.process(bound);
-            //writer.process(node);   
-            //writer.process(ways);
+            }
             
             writer.complete();
             writer.close();
