@@ -75,7 +75,9 @@ public class HelloWorld {
      */
     public static void main(String[] args) {        
         
-        File file = new File("shikoku-latest-free/gis_osm_roads_free_1.shp");
+        // File file = new File("shikoku-latest-free/gis_osm_roads_free_1.shp");
+        File file = new File("lanelet-shp/Clip_OutFeatureClass_udbx3_lane.shp");
+
         Map<String,Object> map = new HashMap<String,Object>();
         
         File out = new File("test.osm");
@@ -136,15 +138,38 @@ public class HelloWorld {
                     
                     Collection<Tag> nTags = new ArrayList<Tag>();
                     Collection<Tag> wTags = new ArrayList<Tag>();
+                    Collection<Tag> rTags = new ArrayList<Tag>();
                     
                     List<RelationMember> members = new ArrayList<RelationMember>();
                     
-                    wTags.add(new Tag("code"  ,feature.getAttribute("code").toString()));
-                    wTags.add(new Tag("fclass",feature.getAttribute("fclass").toString()));
-                    wTags.add(new Tag("name"  ,(String) feature.getAttribute("name")));
-                    wTags.add(new Tag("layer" ,feature.getAttribute("layer").toString()));
+                    rTags.add(new Tag("type", "lanelet"));
+
+                    for (int x = 0; x < attrs.size(); x++) {
+                        String fn = attrs.get(x).getLocalName();
+
+                        if (fn.compareTo("the_geom") == 0)
+                            continue;
+
+                        wTags.add(new Tag(fn,
+                                feature.getAttribute(fn).toString()));
+
+                        if (fn.contains("left_lane"))
+                            rTags.add(new Tag("left", feature.getAttribute(fn).toString()));
+                        if (fn.contains("right_lane"))
+                            rTags.add(new Tag("right", feature.getAttribute(fn).toString()));
+                        if (fn.contains("lane_numbe"))
+                            rTags.add(new Tag("lane_number", feature.getAttribute(fn).toString()));
+                        if (fn.contains("lane_type"))
+                            rTags.add(new Tag("lane_type", feature.getAttribute(fn).toString()));
+                    }
+
+                    // wTags.add(new Tag("code" ,feature.getAttribute("code").toString()));
+                    // wTags.add(new Tag("fclass",feature.getAttribute("fclass").toString()));
+                    // wTags.add(new Tag("name" ,(String) feature.getAttribute("name")));
+                    // wTags.add(new Tag("layer" ,feature.getAttribute("layer").toString()));
                     
-                    if( feature.getDefaultGeometry() instanceof MultiLineString ) {
+                    if (feature.getDefaultGeometry() instanceof MultiLineString) {
+
                         MultiLineString m = (MultiLineString)feature.getDefaultGeometry();
                         List<WayNode> nodes = new ArrayList<WayNode>();
                         
@@ -166,7 +191,7 @@ public class HelloWorld {
                                     nodes);
                             ways.add(new WayContainer(way));
                             members.add(new RelationMember(
-                                    wayId,EntityType.Way,""));
+                                    wayId, EntityType.Way, ""));
                             
                             wayId += 1;                            
                         }                                                
@@ -174,16 +199,16 @@ public class HelloWorld {
                       
                     if( members.size() > 0 ) {
                         rels.add(new RelationContainer(
-                                new Relation(hw.createEntity(relId, wTags),members))
+                                new Relation(hw.createEntity(relId, rTags), members))
                         );
                         relId += 1;
                     }
                     
                     count++;
-                    if (count >= 400) {
-                        break;
-                    }
-                    
+                    // if (count >= 40) {
+                    // break;
+                    // }
+
                 }
 
                 if( ways.size() > 0 ) {
