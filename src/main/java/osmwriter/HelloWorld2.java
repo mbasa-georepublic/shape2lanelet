@@ -190,8 +190,14 @@ public class HelloWorld2 {
                         
                         for(int i=0;i<m.getNumGeometries();i++) {
                             LineString line = (LineString )m.getGeometryN(i);
+                            double sumHeight = 0d;
                             
                             for(Coordinate pt : line.getCoordinates() ) {
+                                nTags = new ArrayList<Tag>();
+                                nTags.add(new Tag("height", Double.toString(pt.getZ())));
+
+                                sumHeight += pt.getZ();
+
                                 Node node = new Node(
                                         hw.createEntity(nodeId, nTags),
                                         pt.getX(),
@@ -201,7 +207,11 @@ public class HelloWorld2 {
                                 writer.process(new NodeContainer(node));
                                 nodeId += 1;
                             }
-                            
+
+                            if (sumHeight > 0) {
+                                double h = sumHeight / line.getCoordinates().length;
+                                wTags.add(new Tag("height", Double.toString(h)));
+                            }
                             Way way = new Way(hw.createEntity(wayId, wTags),
                                     nodes);
                             ways.add(new WayContainer(way));
