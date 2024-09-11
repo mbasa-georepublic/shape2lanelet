@@ -25,6 +25,8 @@ import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiLineString;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Polygon;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -94,6 +96,9 @@ public class HelloWorld2 {
             
             FeatureSource<SimpleFeatureType, SimpleFeature> source =
                     dataStore.getFeatureSource(typeName);
+            
+            String featureType = source.getSchema()
+                    .getGeometryDescriptor().getType().getName().toString();
             
             Filter filter = Filter.INCLUDE; // ECQL.toFilter("BBOX(THE_GEOM, 10,20,30,40)")
 
@@ -183,7 +188,30 @@ public class HelloWorld2 {
                     // wTags.add(new Tag("name" ,(String) feature.getAttribute("name")));
                     // wTags.add(new Tag("layer" ,feature.getAttribute("layer").toString()));
                     
-                    if (feature.getDefaultGeometry() instanceof MultiLineString) {
+                    if (feature.getDefaultGeometry() instanceof MultiPolygon) {
+                        MultiPolygon mp = (MultiPolygon) feature.getDefaultGeometry();
+
+                        for (int i = 0; i < mp.getNumGeometries(); i++) {
+                            Polygon polygon = (Polygon) mp.getGeometryN(i);
+
+                            for (Coordinate pt : polygon.getCoordinates()) {
+                                nTags = new ArrayList<Tag>();
+                                
+                                if( ! Double.isNaN(pt.getZ())) {
+                                    nTags.add(new Tag("height", 
+                                            Double.toString(pt.getZ())));
+                                }
+                                
+                                Node node = new Node(
+                                        hw.createEntity(nodeId, nTags),
+                                        pt.getX(),
+                                        pt.getY());
+                                writer.process(new NodeContainer(node));
+                                nodeId += 1;
+                            }
+
+                        }
+                    } else if (feature.getDefaultGeometry() instanceof MultiLineString) {
 
                         MultiLineString m = (MultiLineString)feature.getDefaultGeometry();
                         List<WayNode> nodes = new ArrayList<WayNode>();
@@ -194,9 +222,19 @@ public class HelloWorld2 {
                             
                             for(Coordinate pt : line.getCoordinates() ) {
                                 nTags = new ArrayList<Tag>();
-                                nTags.add(new Tag("height", Double.toString(pt.getZ())));
 
-                                sumHeight += pt.getZ();
+                                if (!Double.isNaN(pt.getZ())) {
+                                    double z = pt.getZ();
+                                    nTags.add(new Tag("height",
+                                            Double.toString(z)));
+
+                                    sumHeight += z;
+                                }
+
+                                if (!Double.isNaN(pt.getM())) {
+                                    nTags.add(new Tag("measure",
+                                            Double.toString(pt.getM())));
+                                }
 
                                 Node node = new Node(
                                         hw.createEntity(nodeId, nTags),
