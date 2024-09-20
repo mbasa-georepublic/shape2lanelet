@@ -64,6 +64,8 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+                    <finalName>shp2lanelet</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </execution>
         </executions>
