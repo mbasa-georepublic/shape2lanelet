@@ -77,12 +77,18 @@ public class HelloWorld2 {
      */
     public static void main(String[] args) {        
         
-        // File file = new File("shikoku-latest-free/gis_osm_roads_free_1.shp");
         File file = new File("lanelet-shp/Clip_OutFeatureClass_udbx3_lane.shp");
+
+        if (!file.exists()) {
+            System.out.println("File not found. Exiting");
+            System.exit(1);
+        }
 
         Map<String,Object> map = new HashMap<String,Object>();
         
-        File out = new File("test.osm");
+        String outFile = file.getName().split("\\.(?=[^\\.]+$)")[0];
+        File out = new File(outFile + ".osm");
+
         XmlWriter writer = new XmlWriter(out,CompressionMethod.None,false);
         
         HelloWorld2 hw = new HelloWorld2();

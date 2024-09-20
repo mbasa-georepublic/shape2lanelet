@@ -1,5 +1,6 @@
 .settings
 shikoku-latest-free/
+lanelet-shp/
 *.osm
 .project
 .classpath
